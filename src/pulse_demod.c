@@ -502,6 +502,39 @@ int pulse_demod_piwm_dc(const pulse_data_t *pulses, r_device *device)
     return events;
 }
 
+int pulse_demod_nrzs(const pulse_data_t *pulses, r_device *device)
+{
+    int events = 0;
+    bitbuffer_t bits = {0};
+    int i, n, limit;
+
+    limit = device->s_short_width;
+
+    for (unsigned n = 0; n < pulses->num_pulses; ++n) {
+        if (pulses->pulse[n] > limit) {
+            for(i = 0 ; i < (pulses->pulse[n]/limit) ; i++) {
+                bitbuffer_add_bit(&bits, 1);
+                printf("1");
+            }
+            bitbuffer_add_bit(&bits, 0);
+            printf("0");
+        } else if (pulses->pulse[n] < limit) {
+            bitbuffer_add_bit(&bits, 0);
+            printf("0");
+        }
+
+        if (n == pulses->num_pulses - 1
+                    || pulses->gap[n] >= device->s_reset_limit) {
+
+            events += account_event(device, &bits, __func__);
+            //bitbuffer_clear(&bits);
+        }
+    }
+
+    return events;
+}
+
+
 /*
  * Oregon Scientific V1 Protocol
  * Starts with a clean preamble of 12 pulses with

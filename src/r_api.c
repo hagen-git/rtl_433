@@ -413,6 +413,9 @@ int run_ook_demods(list_t *r_devs, pulse_data_t *pulse_data)
         case OOK_PULSE_PWM_OSV1:
             p_events += pulse_demod_osv1(pulse_data, r_dev);
             break;
+        case OOK_PULSE_NRZS:
+            p_events += pulse_demod_nrzs(pulse_data, r_dev);
+            break;
         // FSK decoders
         case FSK_PULSE_PCM:
         case FSK_PULSE_PWM:
